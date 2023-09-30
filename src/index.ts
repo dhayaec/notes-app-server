@@ -14,6 +14,24 @@ app.get("/api/notes", async (req, res) => {
   res.json(notes);
 });
 
+app.get("/api/notes/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  if (!id || isNaN(id)) {
+    return res.status(400).send("ID must be a valid number");
+  }
+  try {
+    const note = await prisma.note.findUnique({ where: { id } });
+    if (note) {
+      res.json(note);
+    } else {
+      res.status(404).json({ message: "not found" });
+    }
+  } catch (error) {
+    res.status(500).send("Oops, something went wrong " + JSON.stringify(error));
+  }
+});
+
 app.post("/api/notes", async (req, res) => {
   const { title, content } = req.body;
 
